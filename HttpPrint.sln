@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpPrint", "HttpPrint\HttpPrint.csproj", "{3D1A8F52-C959-493D-9191-BEEA2808ED1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpPrint", "HttpPrint\HttpPrint.csproj", "{3D1A8F52-C959-493D-9191-BEEA2808ED1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpPrint.Client", "HttpPrint.Client\HttpPrint.Client.csproj", "{DDFBAA13-1454-4AE0-89F6-AE3970F0AFBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpPrint.Client", "HttpPrint.Client\HttpPrint.Client.csproj", "{DDFBAA13-1454-4AE0-89F6-AE3970F0AFBF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpPrint.BackgroudService", "HttpPrint.BackgroudService\HttpPrint.BackgroudService.csproj", "{B3618153-AE49-4076-A9DC-1843CFC3C3F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{DDFBAA13-1454-4AE0-89F6-AE3970F0AFBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDFBAA13-1454-4AE0-89F6-AE3970F0AFBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDFBAA13-1454-4AE0-89F6-AE3970F0AFBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3618153-AE49-4076-A9DC-1843CFC3C3F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3618153-AE49-4076-A9DC-1843CFC3C3F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3618153-AE49-4076-A9DC-1843CFC3C3F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3618153-AE49-4076-A9DC-1843CFC3C3F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

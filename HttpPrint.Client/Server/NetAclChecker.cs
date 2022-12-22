@@ -9,6 +9,10 @@ namespace HttpPrint.Client.Server
             RemoveAddress(address, Environment.UserDomainName, Environment.UserName);
             AddAddress(address, Environment.UserDomainName, Environment.UserName);
         }
+        public static void RemoveAddress(string address)
+        {
+            RemoveAddress(address, Environment.UserDomainName, Environment.UserName);
+        }
         public static void RemoveAddress(string address, string domain, string user)
         {
             var args = $@"http delete urlacl url={address} user={domain}\{user}";

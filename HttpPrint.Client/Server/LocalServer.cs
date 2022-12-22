@@ -10,6 +10,19 @@ namespace HttpPrint.Client.Server
         private Thread? _listenerThread;
         private int Port => 8888;
 
+        public void Stop()
+        {
+            var ip = Dns.GetHostEntry(Dns.GetHostName())
+                .AddressList
+                .First(x => x.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                .ToString();
+            NetAclChecker.RemoveAddress($"http://localhost:{Port}/");
+            NetAclChecker.RemoveAddress($"http://127.0.0.1:{Port}/");
+            NetAclChecker.RemoveAddress($"http://+:{Port}/");
+            NetAclChecker.RemoveAddress($"http://*:{Port}/");
+            NetAclChecker.RemoveAddress("http://" + ip + ":" + Port + " /");
+            Listener.Stop();
+        }
         public void Start()
         {
             var ip = Dns.GetHostEntry(Dns.GetHostName())
