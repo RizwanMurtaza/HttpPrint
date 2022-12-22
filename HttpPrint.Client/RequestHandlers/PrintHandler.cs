@@ -1,8 +1,6 @@
 ﻿using HttpPrint.Client.Models;
 using Newtonsoft.Json;
-using System.Drawing.Printing;
 using System.Net;
-using System.Reflection.Metadata.Ecma335;
 
 namespace HttpPrint.Client.RequestHandlers
 {
@@ -10,13 +8,15 @@ namespace HttpPrint.Client.RequestHandlers
     {
         public static async Task<PrintResponse> HandlePrintRequest(HttpListenerContext context)
         {
-            var requestBody = await new StreamReader(context.Request.InputStream, context.Request.ContentEncoding).ReadToEndAsync();
+            var requestBody = await new StreamReader(context.Request.InputStream, context.Request.ContentEncoding)
+                .ReadToEndAsync();
             var model = JsonConvert.DeserializeObject<PrintRequest>(requestBody);
-            
+
             if (model == null)
             {
                 return PrintResponse.Failed("Invalid Request body");
             }
+
             try
             {
                 await HandlePrintRequest(model);
@@ -25,6 +25,7 @@ namespace HttpPrint.Client.RequestHandlers
             {
                 return PrintResponse.Failed(e.Message);
             }
+
             return PrintResponse.Success(string.Empty);
         }
 
@@ -47,7 +48,7 @@ namespace HttpPrint.Client.RequestHandlers
             }
 
             var numberOfCopies = request.NumberOfCopies ?? 1;
-            return await PrinterHelper.PrintPdf(request.PrinterName, numberOfCopies,request.FileStream);
+            return await PrinterHelper.PrintPdf(request.PrinterName, numberOfCopies, request.FileStream);
         }
 
         private static async Task<PrintResponse> ValidateRequest(PrintRequest request)
@@ -60,7 +61,8 @@ namespace HttpPrint.Client.RequestHandlers
 
             var allPrinterAvailable = await PrinterHelper.GetAllInstalledPrinters();
 
-            var availablePrinterName = allPrinterAvailable.Where(z => z.ToLower().Equals(request.PrinterName.ToLower())).ToList();
+            var availablePrinterName = allPrinterAvailable.Where(z => z.ToLower().Equals(request.PrinterName.ToLower()))
+                .ToList();
             if (availablePrinterName.Any())
             {
                 request.PrinterName = availablePrinterName.First();
@@ -70,6 +72,7 @@ namespace HttpPrint.Client.RequestHandlers
                 return PrintResponse.Failed("Invalid Printer in request");
 
             }
+
             return PrintResponse.Success();
 
         }
@@ -78,14 +81,19 @@ namespace HttpPrint.Client.RequestHandlers
         {
             try
             {
+                if (string.IsNullOrEmpty(request.Url))
+                {
+                    return PrintResponse.Failed("Invalid Url");
+                }
+
                 var validUrl = new Uri(request.Url);
                 using var client = new HttpClient();
                 using var responseClient = await client.GetAsync(validUrl);
-              
+
                 if (!responseClient.IsSuccessStatusCode)
                     return PrintResponse.Failed("Failed to get file from URL");
-                
-                request.FileStream = await responseClient.Content.ReadAsStreamAsync();
+
+                request.FileStream = await responseClient.Content.ReadAsStreamAsync() as MemoryStream;
                 request.FileStream.Seek(0, SeekOrigin.Begin);
                 return await PrinterHelper.PrintPdf(request.PrinterName, 1, request.FileStream);
 
@@ -97,7 +105,7 @@ namespace HttpPrint.Client.RequestHandlers
             }
         }
 
-        
+
 
     }
 }

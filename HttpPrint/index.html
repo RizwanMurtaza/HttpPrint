@@ -1,0 +1,160 @@
+﻿<html>
+<head>
+    <title>Http Print</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body onload="init()">
+    <form id="printForm">
+        <div class="form-group row">
+            <label for="localServerUrl" class="col-4 col-form-label">Local Server</label>
+            <div class="col-6">
+                <input id="localServerUrl" name="localServerUrl" type="text" value="http://localhost:8888" class="form-control" aria-describedby="localServerUrlHelpBlock">
+                <span id="localServerUrlHelpBlock" class="form-text text-muted">Localhost Url</span>
+            </div>
+            <div class="col-2">
+                <button type="button" class="btn btn-info" onclick="getPrinters();">Refresh</button>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="selectPrinter" class="col-4 col-form-label">Available Printers</label>
+            <div class="col-8">
+                <select id="selectPrinter" name="selectPrinter" class="custom-select" aria-describedby="selectPrinterHelpBlock" required="required"></select>
+                <span id="selectPrinterHelpBlock" class="form-text text-muted">Available Printers</span>
+                <span id="serverError" class="label label-danger">Error retrieving local printers. Looks Like client print is not running</span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-4">Radio Buttons</label>
+            <div class="col-8">
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input name="radio" id="radio_0" type="radio" class="custom-control-input" value="file" onclick="changePrintOption(this)">
+                    <label for="radio_0" class="custom-control-label">Pdf FIleUpload</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input name="radio" id="radio_1" type="radio" class="custom-control-input" value="url" checked="checked" onclick="changePrintOption(this)">
+                    <label for="radio_1" class="custom-control-label">Url to pdf file</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="UrlInput" class="form-group row">
+            <label for="txt_pdfUrl" class="col-4 col-form-label">Url to Pdf file</label>
+            <div class="col-8">
+                <input id="txt_pdfUrl" name="txt_pdfUrl" type="text" class="form-control" required="true">
+            </div>
+        </div>
+
+        <div class="form-group row" id="FileInput" style="display: none;">
+            <label for="txt_pdffile" class="col-4 col-form-label">Please Choose file</label>
+            <div class="col-5">
+                <input id="txt_pdffile" name="txt_pdffile" type="file" class="form-control" required="true" onchange="convertToBase64()">
+                <pre id="fileContent"></pre>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="offset-4 col-8">
+                <button name="submit" type="button" class="btn btn-primary" onclick="send()">Submit</button>
+            </div>
+        </div>
+
+    </form>
+
+
+<script>
+var printers = [];
+    var isUrlPrint = true;
+    var base64;
+
+function init() {
+            getPrinters();
+}
+function changePrintOption(myRadio) {
+            if (myRadio.value == 'file') {
+                document.getElementById('FileInput').style.display = '';
+                document.getElementById('UrlInput').style.display = 'none';
+                isUrlPrint = false;
+            }
+            else {
+                document.getElementById('FileInput').style.display = 'none';
+                document.getElementById('UrlInput').style.display = '';
+                isUrlPrint = true;
+            }
+}
+async function getPrinters() {
+            try {
+                let address = document.getElementById('localServerUrl').value.trim();
+                if (address.length === 0) throw 'enter an address for Http Print';
+                var getPrintersUrl = address + '/printerlist';;
+                let response = await fetch(getPrintersUrl);
+                let result = await response.json();
+                setPrinters(result);
+            } catch (error) {
+                console.log(error);
+                document.getElementById('serverError').style.display = 'block';
+                document.getElementById('selectPrinter').innerHTML = '';
+            }
+}
+
+function setPrinters(p) {
+            printers = p;
+            var html = '';
+            for (var i = 0; i < printers.length; i++) {
+                var printer = printers[i];
+                html += '<option>' + printer + '</option>';
+            }
+            document.getElementById('serverError').style.display = 'none';
+            document.getElementById('selectPrinter').innerHTML = html;
+}
+
+async function send() {
+            try {
+
+                let address = document.getElementById('localServerUrl').value.trim() + '/print';
+                let printer = document.getElementById('selectPrinter').value;
+                let printUrl = document.getElementById('txt_pdfUrl').value;
+                let response = await fetch(address, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        PrinterName: printer,
+                        Base64String: base64,
+                        Url: printUrl,
+                        IsUrlRequest: isUrlPrint
+
+                    })
+                });
+                let result = await response.json();
+                console.log('result', result);
+                alert('Data Sent\n\nPrinter: ' + printer + '\n\nData:');
+            } catch (error) {
+                console.log(error);
+                alert(error);
+            }
+}
+
+    function convertToBase64() {
+        //Read File
+        var selectedFile = document.getElementById("txt_pdffile").files;
+        //Check File is not Empty
+        if (selectedFile.length > 0) {
+            // Select the very first file from list
+            var fileToLoad = selectedFile[0];
+            // FileReader function for read the file.
+            var fileReader = new FileReader();
+           
+            // Onload of file read the file content
+            fileReader.onload = function (fileLoadedEvent) {
+                base64 = fileLoadedEvent.target.result.replace('data:', '')
+                    .replace(/^.+,/, '');;
+                // Print data in console
+                console.log(base64);
+            };
+            // Convert data to base64
+            fileReader.readAsDataURL(fileToLoad);
+        }
+    }
+
+    </script>
+</body>
+</html>
