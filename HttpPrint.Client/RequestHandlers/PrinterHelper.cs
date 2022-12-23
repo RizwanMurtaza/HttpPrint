@@ -8,7 +8,18 @@ namespace HttpPrint.Client.RequestHandlers
         public static async Task<List<string>> GetAllInstalledPrinters()
         {
             var printers = PrinterSettings.InstalledPrinters.Cast<string>().ToList();
-            return await Task.FromResult(printers);
+            var virtualPrinters = new List<string>()
+            {
+                "", "", "", "",
+            };
+
+            var actual = printers.Where(x => !x.ToLower().Contains("document")
+                                         && !x.ToLower().Contains("onenote")
+                                         && !x.ToLower().Contains("print to pdf")
+                                         && !x.ToLower().Contains("fax")
+
+                ).ToList();
+            return await Task.FromResult(actual);
         }
 
         public static async Task<PrintResponse> PrintPdf(string printerName, int copies, Stream stream)

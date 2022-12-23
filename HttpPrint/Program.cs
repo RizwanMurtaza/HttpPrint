@@ -4,4 +4,4 @@ using HttpPrint.Client.Server;
 
 Console.WriteLine("Hello, World!");
 var server = new LocalServer();
-server.Start();
+await server.Start();
